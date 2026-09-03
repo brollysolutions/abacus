@@ -1,24 +1,117 @@
-import Link from "next/link";
-import SkipLink from "@/components/SkipLink";
-import Notice from "@/components/Notice";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import MobileCta from "@/components/MobileCta";
-import Section, { Container } from "@/components/Section";
-import Eyebrow from "@/components/Eyebrow";
-import Button from "@/components/Button";
-import LeadForm from "@/components/LeadForm";
+import { Fragment } from "react";
+import Image from "next/image";
+
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter, { FloatingActions } from "@/components/SiteFooter";
+import PageToc from "@/components/PageToc";
+import SectionNav from "@/components/SectionNav";
+import EnquiryForm from "@/components/EnquiryForm";
 import JsonLd from "@/components/JsonLd";
-import Programme from "@/components/Programme";
-import Faq from "@/components/Faq";
-import { CLASSES_MENU, CLASS_LINKS, ROUTES } from "@/lib/nav";
-import { BUSINESS, absoluteUrl } from "@/lib/business";
+
+import { SECTIONS } from "@/lib/nav";
+import {
+  BUSINESS,
+  ADDRESS,
+  WHATSAPP_MESSAGES,
+  buildWhatsappHref,
+  absoluteUrl,
+} from "@/lib/business";
+import { TRAINER, PRACTICE } from "@/lib/programme";
 import { pageOpenGraph } from "@/lib/seo";
+import { buildHomeGraph } from "@/lib/schema";
+
+import {
+  HERO,
+  BATCH_SECTION,
+  BATCH_ROWS,
+  BATCH_CTA,
+  CURRICULUM_SECTION,
+  CURRICULUM_HEADERS,
+  CURRICULUM_ROWS,
+  PATHWAY_NOTES,
+  OVERVIEW_SECTION,
+  OVERVIEW_CARDS,
+  PROGRAMMES_SECTION,
+  PROGRAMMES,
+  HOW_SECTION,
+  HOW_STEPS,
+  METHOD_SECTION,
+  METHOD_STEPS,
+} from "@/lib/content/course";
+import {
+  WHY_SECTION,
+  WHY_CARDS,
+  COMPARISON_SECTION,
+  COMPARISON_SUMMARY,
+  COMPARISON_HEADERS,
+  COMPARISON_ROWS,
+  COMPARISON_NOTE,
+  ABACUS_SECTION,
+  PREREQ_SECTION,
+  PREREQUISITES,
+  PREREQ_NOTE,
+  SKILLS_SECTION,
+  SKILLS,
+} from "@/lib/content/why";
+import {
+  FEES_SECTION,
+  FEE_MODES,
+  FEE_COMPARE_HEADERS,
+  FEE_COMPARE_ROWS,
+  CENTRE_SECTION,
+  PRACTICE_SECTION,
+  PRACTICE_BLOCKS,
+} from "@/lib/content/fees";
+import {
+  BENEFITS_SECTION,
+  BENEFIT_PILLS,
+  EVIDENCE,
+  EVIDENCE_LINKS,
+  NO_PROMISE,
+  FIT_SECTION,
+  READY_SIGNS,
+  WAIT_SIGNS,
+  PROGRESS_SECTION,
+  PROGRESS_HEADERS,
+  PROGRESS_ROWS,
+  EXAMPLE_UPDATE,
+  TRAINER_SECTION,
+  TESTIMONIALS_SECTION,
+  TESTIMONIALS,
+  TESTIMONIALS_NOTE,
+  CHOOSE_SECTION,
+  CHOOSE_CHECKLIST,
+  VEDIC_SECTION,
+  VEDIC_HEADERS,
+  VEDIC_ROWS,
+} from "@/lib/content/outcomes";
+import { FAQ_SECTION, FAQS } from "@/lib/content/faqs";
+import {
+  HERO_FORM,
+  DEMO_FORM,
+  ENROL_SECTION,
+  ENROL_STEPS,
+  ENROL_CTA,
+  DEMO_SECTION,
+} from "@/lib/content/forms";
 
 export const metadata = {
-  title: "Abacus Experts | Live Abacus Classes for Kids, Online & Hyderabad",
+  title: "Abacus Classes in Hyderabad for Kids | Abacus Experts",
   description:
-    "Abacus Experts teaches children aged 5–13 mental arithmetic through live, level-based abacus classes — online across India and in Hyderabad. Book a free readiness assessment.",
+    "Live abacus classes in Hyderabad for kids aged 5–13. Learn at our Hyder Nagar centre or online. Check levels, fees, batches and book a free demo.",
+  keywords: [
+    "abacus classes in Hyderabad",
+    "abacus classes near me",
+    "abacus classes for kids",
+    "online abacus classes",
+    "abacus training in Hyderabad",
+    "abacus course in Hyderabad",
+    "abacus classes fees in Hyderabad",
+    "abacus institute in Hyderabad",
+    "mental maths classes for kids",
+    "abacus classes in Nizampet",
+    "abacus classes in Kukatpally",
+  ],
   robots: {
     index: true,
     follow: true,
@@ -26,678 +119,982 @@ export const metadata = {
     "max-snippet": -1,
     "max-video-preview": -1,
   },
-  alternates: { canonical: "/" },
+  alternates: { canonical: absoluteUrl("/") },
   openGraph: pageOpenGraph({
     url: "/",
-    title: "Abacus Experts | Live Abacus Classes for Kids",
+    title: "Abacus Classes in Hyderabad for Kids",
     description:
-      "Live, accuracy-first abacus and mental arithmetic learning for children — online and in Hyderabad.",
+      "Live classroom and online abacus training for children aged 5–13, with a free readiness assessment before enrolment.",
   }),
   twitter: {
     card: "summary",
-    title: "Abacus Experts | Live Abacus Classes for Kids",
+    title: "Abacus Classes in Hyderabad for Kids",
     description:
-      "Small live batches, a written syllabus and parent-visible progress. Start with a free readiness assessment.",
+      "Live classroom and online abacus training for ages 5–13. Book a free readiness assessment.",
   },
 };
 
-const NAV = [
-  { href: "#why", label: "Why us" },
-  CLASSES_MENU,
-  { href: "#programmes", label: "Programmes" },
-  { href: "#how", label: "How it works" },
-  { href: "#faq", label: "FAQs" },
-];
+const JSONLD = buildHomeGraph(FAQS);
+const WA_GENERAL = buildWhatsappHref(WHATSAPP_MESSAGES.general);
+const WA_DEMO = buildWhatsappHref(WHATSAPP_MESSAGES.demo);
+const TEL = `tel:+${BUSINESS.phoneDigits}`;
 
-const FORMATS = [
-  {
-    href: ROUTES.online,
-    tone: "teal",
-    pill: "Available across India",
-    title: "Abacus online classes",
-    lede: "Live, teacher-led lessons your child joins from home on a physical abacus, with the camera positioned so the trainer can see hands and beads.",
-    points: [
-      "Small level-matched batches",
-      "Real-time technique correction",
-      "No commute; flexible batch times",
-      "Junior and senior pathways",
-    ],
-    cta: "Explore online classes",
-  },
-  {
-    href: ROUTES.hyderabad,
-    tone: "amber",
-    pill: "Hyderabad, Telangana",
-    title: "Abacus classes in Hyderabad",
-    lede: "The same level-based programme for families in Hyderabad, with guidance on choosing between a nearby centre and a live online batch.",
-    points: [
-      "Areas across the city covered",
-      "In-person or online, your choice",
-      "Level-matched groups, not mixed",
-      "Written fees and policies",
-    ],
-    cta: "See Hyderabad classes",
-  },
-];
-
-const WHY_CARDS = [
-  ["Placement before enrolment", "Every child starts with a free readiness check — number recognition, counting, attention and previous learning — so nobody is pushed into the wrong level."],
-  ["Small, level-matched batches", "Up to six junior learners and up to eight senior learners, so the trainer can watch each child's technique and hear each child's answer."],
-  ["Technique the teacher can see", "Lessons are built around observation. The trainer corrects finger movement and bead placement, not just the final answer."],
-  ["Accuracy before speed", "Children move up when method, place value and independence are stable — not because a stopwatch or a term calendar says so."],
-  ["A written syllabus", "Each level states the concepts covered, the practice expected, how it is assessed and what the child must demonstrate to progress."],
-  ["Progress parents can read", "Updates cover technique, accuracy, independence, visualisation and practice — in plain language, with the next step spelled out."],
-];
-
-const STEPS = [
-  ["Free readiness assessment", "We meet your child, check basic number skills and recommend a starting level — or a later start if that suits better."],
-  ["Level-matched placement", "Junior or senior pathway, with an entry point that is challenging but achievable for your child."],
-  ["Live guided classes", "Twice-weekly lessons: demonstration, guided bead work, individual checks and immediate correction."],
-  ["Short home practice", "Focused worksheets and bead drills — usually 10–15 minutes on several days, not hours of homework."],
-  ["Review and progression", "Technique, accuracy, independence and visualisation are checked before the next level opens."],
-];
-
-const PRINCIPLES = [
-  ["Physical abacus first", "Foundation levels use a real bead frame. A digital abacus is not a substitute while finger technique is still forming."],
-  ["Explain, don't just answer", "Children are asked to demonstrate or talk through a step, which surfaces guessing that a correct answer can hide."],
-  ["Correct calmly and early", "Small movement errors are fixed in the same lesson, before they harden into habits that are difficult to unlearn."],
-  ["Honest about limits", "We describe what abacus practice can support, and we do not promise IQ gains, photographic memory or guaranteed marks."],
-];
-
-const AUDIENCE = [
-  ["Ages 5–8", "Junior pathway", "Shorter activity cycles, concrete demonstration and plenty of repetition for first-time learners."],
-  ["Ages 8–13", "Senior pathway", "A faster progression for older beginners or children continuing from earlier abacus levels."],
-  ["Returning learners", "Placement check", "Children who studied abacus before are re-assessed so gaps are fixed rather than skipped over."],
-];
-
-const FEE_ITEMS = [
-  "Total tuition and the number of live classes included",
-  "Class duration, frequency and maximum batch size",
-  "Physical abacus, workbook and worksheet costs",
-  "Assessment, exam and certificate charges",
-  "Makeup, pause, transfer, cancellation and refund terms",
-];
-
-const FAQS = [
-  ["What does Abacus Experts teach?", "We teach children to calculate on a physical abacus and, as they progress, with an imagined abacus. The pathway runs from tool orientation and place value through addition, subtraction, multiplication, division and mental visualisation, with accuracy checked at every level."],
-  ["Do you offer online classes or classroom classes?", "Both. Live online classes are available to families across India, and we run a Hyderabad programme for families who prefer or are comparing an in-person option. The syllabus, batch sizes and progression rules are the same in either format."],
-  ["What age should my child start?", "Many children are ready from about age five. The useful signals are basic number recognition, reliable counting, following short instructions and staying with a guided activity for a while. Readiness matters more than the birthday, which is why we assess first."],
-  ["How long is a class and how often?", "A practical rhythm is two live classes each week. Junior learners generally do better with 45–50 minute lessons; senior learners usually manage 55–60 minutes. Placement and attention guide the final schedule."],
-  ["How much home practice is expected?", "Short and consistent beats long and occasional. Most beginners start with 10–15 focused minutes on several days a week, and the trainer reduces the load if accuracy or confidence starts slipping."],
-  ["What does my child need to get started?", "A curriculum-compatible physical abacus, workbook, pencil and a clear desk. For online classes, add a device with a camera and a stable connection, positioned so the trainer can see the working hand and the abacus."],
-  ["Will abacus improve my child's school maths?", "Abacus practice can support arithmetic fluency and comfort with numbers, which often helps. It does not cover the whole school curriculum — word problems, geometry, reasoning and proof still belong to classroom maths — and no provider should guarantee marks."],
-  ["Is the free assessment really free?", "Yes. The readiness assessment carries no payment and no obligation. Its purpose is to work out whether abacus suits your child right now, and if so, where they should start."],
-];
-
-const FOOTER_COLUMNS = [
-  {
-    heading: "Classes",
-    items: [
-      ...CLASS_LINKS,
-      { href: "#programmes", label: "Junior & senior programmes" },
-      { href: "#how", label: "How it works" },
-      { href: "#faq", label: "Parent FAQs" },
-    ],
-  },
-  {
-    heading: "Contact",
-    items: [
-      { type: "phone" },
-      { type: "whatsapp" },
-      { type: "email" },
-      { href: "/privacy-policy/", label: "Privacy policy" },
-    ],
-  },
-];
-
-const WHATSAPP_MSG =
-  "Hello Abacus Experts, I would like to know about your abacus classes and book a free readiness assessment.";
-
-/* Absolute @ids so every page in the site refers to the SAME
-   Organization and WebSite node rather than a per-page duplicate. */
-const ORG_ID = `${BUSINESS.url}/#organization`;
-const SITE_ID = `${BUSINESS.url}/#website`;
-
-const JSONLD = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": ORG_ID,
-      name: BUSINESS.name,
-      url: BUSINESS.url,
-      email: BUSINESS.email,
-      slogan: "Measured Mental Maths. Confident Learners.",
-      description:
-        "Live, level-based abacus and mental arithmetic learning for children, delivered online across India and in Hyderabad.",
-    },
-    {
-      "@type": "WebSite",
-      "@id": SITE_ID,
-      name: BUSINESS.name,
-      url: BUSINESS.url,
-      inLanguage: "en-IN",
-      publisher: { "@id": ORG_ID },
-    },
-    {
-      "@type": "WebPage",
-      "@id": `${absoluteUrl("/")}#webpage`,
-      url: absoluteUrl("/"),
-      name: "Abacus Experts | Live Abacus Classes for Kids",
-      description:
-        "Home page for Abacus Experts: live abacus classes for children aged 5–13, available online and in Hyderabad, with readiness assessment, level-based syllabus and parent progress reports.",
-      inLanguage: "en-IN",
-      isPartOf: { "@id": SITE_ID },
-      about: [
-        { "@type": "Thing", name: "Abacus" },
-        { "@type": "Thing", name: "Mental arithmetic" },
-      ],
-      publisher: { "@id": ORG_ID },
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: FAQS.map(([q, a]) => ({
-        "@type": "Question",
-        name: q,
-        acceptedAnswer: { "@type": "Answer", text: a },
-      })),
-    },
-  ],
-};
-
-const CARD = "rounded-[19px] border border-line bg-white p-[25px]";
-const ICON =
-  "mb-[18px] grid h-[46px] w-[46px] place-items-center rounded-[13px] font-black";
-
-function Rod({ beads }) {
+/** The prompt-plus-button strip that closes most sections. */
+function SectionCta({ text, label = "Book free readiness assessment", href = "#assessment" }) {
   return (
-    <div className="relative h-6 border-t-2 border-navy">
-      {beads.map((left, i) => (
-        <span
-          key={i}
-          className="absolute top-[-8px] h-[15px] w-[15px] rounded-full odd:bg-teal even:bg-amber"
-          style={{ left }}
-        />
-      ))}
+    <div className="section-cta">
+      <p>{text}</p>
+      <a className="button" href={href}>
+        {label}
+        <span>→</span>
+      </a>
     </div>
   );
 }
 
-export default function Home() {
+function SectionHead({ eyebrow, title, id, children }) {
+  return (
+    <div className="section-head">
+      <p className="eyebrow">{eyebrow}</p>
+      <h2 id={id}>{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+export default function HomePage() {
   return (
     <>
       <JsonLd data={JSONLD} />
-      <SkipLink />
-      <Notice>
-        <strong>New batches open:</strong> Start with a free child-readiness
-        assessment—no payment required.
-      </Notice>
-      <Header links={NAV} />
+      <main>
+        <SiteHeader />
 
-      <main id="main">
-        {/* Hero */}
-        <section
-          id="top"
-          className="relative overflow-hidden bg-[radial-gradient(circle_at_82%_12%,rgba(15,139,141,.14),transparent_29%),radial-gradient(circle_at_8%_92%,rgba(255,183,3,.17),transparent_25%),var(--color-warm)] pb-[68px] pt-[74px] max-sm2:pb-14 max-sm2:pt-12"
-        >
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -bottom-[210px] -right-[180px] h-[390px] w-[390px] rounded-full border-[65px] border-amber/8"
-          />
-          <Container className="relative z-[1] grid grid-cols-[minmax(0,1.12fr)_minmax(360px,.72fr)] items-center gap-[54px] max-lg2:grid-cols-1">
-            <div>
-              <Eyebrow>Live abacus learning for children aged 5–13</Eyebrow>
-              <h1 className="mb-[22px] text-[clamp(2.45rem,6.2vw,5rem)] max-sm2:text-[2.55rem]">
-                Mental maths built on{" "}
-                <span className="text-teal">method, not shortcuts</span>
-              </h1>
-              <p className="max-w-[760px] text-[clamp(1.04rem,2vw,1.23rem)] text-slate">
-                Abacus Experts teaches children to calculate on a physical
-                abacus and then in their heads — in small live batches, with a
-                written syllabus, real-time correction and progress you can
-                actually read. Available online across India and in Hyderabad.
-              </p>
-              <div className="my-6 flex flex-wrap gap-3 max-sm2:[&>a]:w-full">
-                <Button href="#assessment">
-                  Book a free readiness assessment
-                </Button>
-                <Button variant="secondary" href="#classes">
-                  Compare our classes
-                </Button>
-              </div>
-              <ul
-                className="m-0 flex list-none flex-wrap gap-x-[18px] gap-y-2.5 p-0"
-                aria-label="Programme highlights"
+        {/* 1 — Hero */}
+        <section className="hero hero-reference" id="top">
+          <div className="hero-copy">
+            <div className="hero-chips" aria-label="Course highlights">
+              <span>
+                <b>Hyder Nagar</b> · beside JNTU Metro
+              </span>
+              <span>
+                Ages <b>5–13</b>
+              </span>
+              <span>Online, classroom &amp; hybrid</span>
+            </div>
+            <h1>{HERO.title}</h1>
+            <p className="lead">{HERO.lede}</p>
+            <div className="button-row">
+              <a className="button hero-primary" href="#assessment">
+                Book a free demo class
+              </a>
+              <a
+                className="button whatsapp hero-whatsapp"
+                href={WA_GENERAL}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {[
-                  "Live—not pre-recorded",
-                  "Physical abacus practice",
-                  "Small level-matched batches",
-                  "Parent progress updates",
-                ].map((t) => (
-                  <li
-                    key={t}
-                    className="flex items-center gap-[7px] text-[.89rem] font-[760] text-navy"
-                  >
-                    <span className="grid h-[19px] w-[19px] place-items-center rounded-full bg-teal-soft text-[.72rem] font-black text-teal">
-                      ✓
-                    </span>
-                    {t}
-                  </li>
-                ))}
-              </ul>
+                Ask on WhatsApp
+                <span>↗</span>
+              </a>
             </div>
+            <div className="hero-trust" aria-label="Verified course trust factors">
+              {HERO.stats.map(([value, label]) => (
+                <div key={label}>
+                  <strong>{value}</strong>
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
-            {/* Class illustration */}
-            <div
-              className="relative rounded-[27px] border border-navy/12 bg-white p-[15px] shadow-card"
-              aria-label="Illustration of an Abacus Experts class"
-            >
-              <div className="flex items-center justify-between px-[7px] pb-[15px] pt-[7px]">
-                <div className="flex gap-1.5">
-                  <i className="block h-[9px] w-[9px] rounded-full bg-amber" />
-                  <i className="block h-[9px] w-[9px] rounded-full bg-[#d9e3e8]" />
-                  <i className="block h-[9px] w-[9px] rounded-full bg-[#d9e3e8]" />
-                </div>
-                <span className="text-[.72rem] font-[750] text-slate">
-                  Abacus Experts · Live class
-                </span>
-              </div>
-              <div className="relative min-h-[365px] overflow-hidden rounded-[19px] bg-[linear-gradient(145deg,var(--color-navy),var(--color-deep))] p-7 max-sm2:min-h-[325px] max-sm2:p-[22px]">
-                <span className="mb-[21px] inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-[.7rem] font-black uppercase tracking-[.08em] text-white before:h-[7px] before:w-[7px] before:rounded-full before:bg-[#ff5c5c] before:content-['']">
-                  Live instruction
-                </span>
-                <h2 className="max-w-[280px] text-[1.55rem] text-white">
-                  Accuracy first. Speed follows.
-                </h2>
-                <p className="max-w-[270px] text-[.86rem] text-white/66">
-                  The trainer observes finger movement and bead placement—not
-                  just the final answer.
-                </p>
-                <div
-                  aria-hidden
-                  className="absolute -right-[14px] bottom-[25px] h-[165px] w-[245px] rotate-[-3deg] rounded-[17px] border-8 border-amber bg-[#fff8df] px-5 py-[18px] shadow-[0_18px_45px_rgba(0,0,0,.25)] max-sm2:-right-[38px] max-sm2:h-[150px] max-sm2:w-[220px]"
-                >
-                  <Rod beads={["15%", "40%"]} />
-                  <Rod beads={["50%", "70%"]} />
-                  <Rod beads={["22%", "39%", "58%"]} />
-                  <Rod beads={["62%", "80%"]} />
-                  <Rod beads={["30%", "49%"]} />
-                </div>
-                <div aria-hidden className="absolute bottom-5 left-6 flex">
-                  {["AK", "RS", "VM", "+3"].map((c, i) => (
-                    <span
-                      key={c}
-                      className={`mr-[-8px] grid h-9 w-9 place-items-center rounded-full border-[3px] border-navy text-[.7rem] font-black text-navy ${
-                        i === 3 ? "bg-amber-soft" : "bg-teal-soft"
-                      }`}
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Container>
+          <EnquiryForm
+            {...HERO_FORM}
+            heading={
+              <>
+                <p className="eyebrow">{HERO.formEyebrow}</p>
+                <h2>{HERO.formTitle}</h2>
+                <p>{HERO.formLede}</p>
+              </>
+            }
+          />
         </section>
 
-        {/* Stats strip */}
-        <div
-          className="border-y border-line bg-white"
-          aria-label="Programme facts"
-        >
-          <Container className="grid grid-cols-4 max-lg2:grid-cols-2 max-sm2:grid-cols-1">
-            {[
-              ["Approx. ages 5–13", "Readiness matters more than age alone"],
-              ["Two live classes a week", "Plus short, focused home practice"],
-              ["Up to 6 junior learners", "Designed for closer beginner observation"],
-              ["Up to 8 senior learners", "Level-matched groups, never mixed"],
-            ].map(([s, t]) => (
-              <div
-                key={s}
-                className="border-line px-[25px] py-[23px] [&:not(:last-child)]:border-r max-lg2:[&:nth-child(2)]:border-r-0 max-lg2:[&:nth-child(-n+2)]:border-b max-sm2:border-b max-sm2:border-r-0 max-sm2:px-[18px] max-sm2:[&:last-child]:border-b-0"
+        {/* 2 — Table of contents */}
+        <PageToc items={SECTIONS} />
+
+        {/* 3 — Batch details */}
+        <section className="section current-batch" id="batches">
+          <SectionHead eyebrow={BATCH_SECTION.eyebrow} title={BATCH_SECTION.title}>
+            <p>{BATCH_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="batch-details-wrap">
+            <div className="table-wrap batch-details-table">
+              <table>
+                <tbody>
+                  <tr>
+                    <th scope="row">Trainer name</th>
+                    <td>
+                      <a href="/about-us/#trainer">{TRAINER.name}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Trainer experience</th>
+                    <td>
+                      <b>{TRAINER.experience}</b>
+                    </td>
+                  </tr>
+                  {BATCH_ROWS.slice(2, 9).map(([term, detail]) => (
+                    <tr key={term}>
+                      <th scope="row">{term}</th>
+                      <td>{detail}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <th scope="row">Current demo session</th>
+                    <td>
+                      <a href="/contact-us/#demo">Contact us</a> to confirm the
+                      next date, time and open seats
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Call us</th>
+                    <td>
+                      <a href={TEL}>{BUSINESS.phoneDisplay}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Email us</th>
+                    <td>
+                      <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <aside className="batch-demo-card">
+              <p className="eyebrow">{BATCH_CTA.eyebrow}</p>
+              <h3>{BATCH_CTA.title}</h3>
+              <p>{BATCH_CTA.lede}</p>
+              <ul>
+                {BATCH_CTA.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+              <a className="button" href="#assessment">
+                Enroll for a free demo
+                <span>→</span>
+              </a>
+              <a
+                className="button whatsapp"
+                href={WA_GENERAL}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <strong className="block text-[1rem] text-navy">{s}</strong>
-                <span className="text-[.82rem] text-slate">{t}</span>
+                Ask for current seats
+                <span>↗</span>
+              </a>
+            </aside>
+          </div>
+        </section>
+
+        {/* Section jump strip */}
+        <SectionNav items={SECTIONS.slice(1)} label="Course page sections" />
+
+        {/* 4 — Curriculum */}
+        <section className="section curriculum-section" id="syllabus">
+          <SectionHead
+            eyebrow={CURRICULUM_SECTION.eyebrow}
+            title={CURRICULUM_SECTION.title}
+          >
+            <p>{CURRICULUM_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="curriculum-table">
+            <div className="curriculum-row curriculum-head">
+              {CURRICULUM_HEADERS.map((h) => (
+                <span key={h}>{h}</span>
+              ))}
+            </div>
+            {CURRICULUM_ROWS.map((row) => (
+              <div className="curriculum-row" key={row[0]}>
+                <span>
+                  <b>{row[0]}</b>
+                </span>
+                {row.slice(1).map((cell, i) => (
+                  <span key={i}>{cell}</span>
+                ))}
               </div>
             ))}
-          </Container>
-        </div>
+          </div>
 
-        {/* Choose a format */}
-        <Section id="classes" aria-labelledby="classes-title">
-          <Eyebrow>Two ways to learn</Eyebrow>
-          <h2 id="classes-title">Choose the class that fits your family</h2>
-          <p className="mb-[38px] max-w-[760px] text-[1.06rem] text-slate">
-            The curriculum, batch sizes and progression rules are identical.
-            Only the delivery differs — pick whichever your child will attend
-            most consistently.
-          </p>
-          <div className="grid grid-cols-2 gap-[23px] max-sm2:grid-cols-1">
-            {FORMATS.map((f) => {
-              const isTeal = f.tone === "teal";
-              return (
-                <article
-                  key={f.href}
-                  className="relative flex flex-col overflow-hidden rounded-xl2 border border-line bg-white p-[30px] shadow-card max-sm2:p-[27px_22px]"
-                >
-                  <span
-                    aria-hidden
-                    className={`absolute inset-x-0 top-0 h-[7px] ${
-                      isTeal ? "bg-teal" : "bg-amber"
-                    }`}
-                  />
-                  <span
-                    className={`mb-[15px] inline-flex self-start rounded-full px-2.5 py-1.5 text-[.74rem] font-extrabold ${
-                      isTeal
-                        ? "bg-teal-soft text-[#076567]"
-                        : "bg-amber-soft text-[#7a5200]"
-                    }`}
-                  >
-                    {f.pill}
-                  </span>
-                  <h3 className="text-[1.42rem]">{f.title}</h3>
-                  <p className="text-slate">{f.lede}</p>
-                  <ul className="m-0 mt-2 grid list-none gap-2 p-0">
-                    {f.points.map((p) => (
-                      <li
-                        key={p}
-                        className="flex items-start gap-2.5 text-[.9rem] text-slate"
-                      >
-                        <b className={isTeal ? "text-teal" : "text-[#8a5c00]"}>
-                          ✓
-                        </b>
-                        <span>{p}</span>
-                      </li>
+          <div className="curriculum-notes">
+            {PATHWAY_NOTES.map(([title, text]) => (
+              <article key={title}>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+
+          <SectionCta text={CURRICULUM_SECTION.cta} />
+        </section>
+
+        {/* 5 — Course overview */}
+        <section className="section" id="programme">
+          <SectionHead
+            eyebrow={OVERVIEW_SECTION.eyebrow}
+            title={OVERVIEW_SECTION.title}
+          >
+            <p>{OVERVIEW_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="three-grid">
+            {OVERVIEW_CARDS.map(([title, text], i) => (
+              <article key={title}>
+                <span className="number">{String(i + 1).padStart(2, "0")}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+
+          <SectionCta text={OVERVIEW_SECTION.cta} />
+        </section>
+
+        {/* 6 — Why us */}
+        <section className="section tinted" id="why-us">
+          <SectionHead eyebrow={WHY_SECTION.eyebrow} title={WHY_SECTION.title}>
+            <p>{WHY_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="feature-grid">
+            {WHY_CARDS.map(([title, text]) => (
+              <article className="feature" key={title}>
+                <span>✓</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <SectionCta text={WHY_SECTION.cta} />
+        </section>
+
+        {/* 7 — Comparison */}
+        <section className="section comparison" id="comparison">
+          <SectionHead
+            eyebrow={COMPARISON_SECTION.eyebrow}
+            title={COMPARISON_SECTION.title}
+          >
+            <p>{COMPARISON_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="comparison-summary">
+            {COMPARISON_SUMMARY.map(([title, text], i) => (
+              <article key={title} className={i === 1 ? "standout" : undefined}>
+                <strong>{title}</strong>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="table-wrap comparison-table">
+            <table>
+              <thead>
+                <tr>
+                  {COMPARISON_HEADERS.map((h) => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON_ROWS.map((row) => (
+                  <tr key={row[0]}>
+                    {row.map((cell, i) => (
+                      <td key={i}>{i === 2 ? <b>{cell}</b> : cell}</td>
                     ))}
-                  </ul>
-                  <div className="mt-[25px]">
-                    <Button
-                      href={f.href}
-                      variant={isTeal ? "primary" : "secondary"}
-                    >
-                      {f.cta}
-                    </Button>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="audit-note">
+            <strong>{COMPARISON_NOTE.title}</strong>
+            <p>{COMPARISON_NOTE.text}</p>
+          </div>
+
+          <SectionCta text={COMPARISON_SECTION.cta} />
+        </section>
+
+        {/* 8 — What is an abacus */}
+        <section className="section split">
+          <div className="method-image">
+            <Image
+              src="/abacus-method.png"
+              alt="Trainer showing correct bead movement on a physical abacus"
+              fill
+              sizes="(max-width:900px) 100vw, 45vw"
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+          <div>
+            <p className="eyebrow">{ABACUS_SECTION.eyebrow}</p>
+            <h2>{ABACUS_SECTION.title}</h2>
+            <p className="lead-small">{ABACUS_SECTION.lede}</p>
+            <h3>{ABACUS_SECTION.blockTitle}</h3>
+            <p>{ABACUS_SECTION.blockText}</p>
+            <a className="button" href="#assessment">
+              {ABACUS_SECTION.cta}
+              <span>→</span>
+            </a>
+          </div>
+        </section>
+
+        {/* 9 — Prerequisites */}
+        <section className="section prerequisites" id="prerequisites">
+          <SectionHead
+            eyebrow={PREREQ_SECTION.eyebrow}
+            title={PREREQ_SECTION.title}
+          >
+            <p>{PREREQ_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="prerequisite-grid">
+            <div className="readiness-checks">
+              {PREREQUISITES.map(([title, text]) => (
+                <article key={title}>
+                  <span>✓</span>
+                  <div>
+                    <h3>{title}</h3>
+                    <p>{text}</p>
                   </div>
                 </article>
-              );
-            })}
+              ))}
+            </div>
+            <aside className="readiness-note">
+              <p className="eyebrow">{PREREQ_NOTE.eyebrow}</p>
+              <h3>{PREREQ_NOTE.title}</h3>
+              <p>{PREREQ_NOTE.text}</p>
+              <ul>
+                {PREREQ_NOTE.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </aside>
           </div>
-        </Section>
 
-        {/* Why us */}
-        <Section id="why" tone="mist" aria-labelledby="why-title">
-          <Eyebrow>Why parents choose us</Eyebrow>
-          <h2 id="why-title">What makes an Abacus Experts class different</h2>
-          <p className="mb-[38px] max-w-[760px] text-[1.06rem] text-slate">
-            Abacus is a hands-on skill. Everything below exists so a trainer can
-            actually see what each child is doing and correct it while it still
-            matters.
-          </p>
-          <div className="grid grid-cols-3 gap-[19px] max-lg2:grid-cols-2 max-sm2:grid-cols-1">
-            {WHY_CARDS.map(([title, text], i) => (
-              <article key={title} className={CARD}>
-                <div
-                  className={`${ICON} ${
-                    i % 2 === 1
-                      ? "bg-amber-soft text-[#8a5c00]"
-                      : "bg-teal-soft text-teal"
-                  }`}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-                <h3 className="mb-[9px] text-[1.2rem]">{title}</h3>
-                <p className="m-0 text-[.91rem] text-slate">{text}</p>
+          <SectionCta text={PREREQ_SECTION.cta} />
+        </section>
+
+        {/* 10 — Skills */}
+        <section className="section skill-gain-section tinted" id="skills-gained">
+          <SectionHead
+            eyebrow={SKILLS_SECTION.eyebrow}
+            title={SKILLS_SECTION.title}
+          >
+            <p>{SKILLS_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="skill-gain-grid">
+            {SKILLS.map(([title, text], i) => (
+              <article key={title}>
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
               </article>
             ))}
           </div>
-        </Section>
 
-        {/* Programmes */}
-        <Section id="programmes" aria-labelledby="programmes-title">
-          <Eyebrow>Junior and senior pathways</Eyebrow>
-          <h2 id="programmes-title">Our programmes</h2>
-          <p className="mb-[38px] max-w-[760px] text-[1.06rem] text-slate">
-            Both pathways cover the full progression from bead calculation to
-            mental arithmetic. The entry point depends on the readiness
-            assessment, not only on age.
-          </p>
-          <div className="grid grid-cols-2 gap-[23px] max-sm2:grid-cols-1">
-            <Programme
-              tone="junior"
-              pill="Approx. ages 5–8"
-              title="Junior Abacus"
-              lede="Shorter activity cycles and more concrete demonstration for first-time learners."
-              items={[
-                "Parts of the abacus, posture and finger technique",
-                "Number recognition, place value and bead representation",
-                "Direct addition and subtraction",
-                "Small friends and big friends/complement strategies",
-                "Early multiplication, division and visualisation",
-                "Accuracy-led mental arithmetic practice",
-              ]}
-              meta={["45–50 minute classes", "Up to 6 learners"]}
-            />
-            <Programme
-              tone="senior"
-              pill="Approx. ages 8–13"
-              title="Senior Abacus"
-              lede="A faster progression for older beginners or learners continuing from earlier levels."
-              items={[
-                "Technique calibration and place-value fluency",
-                "Multi-digit mixed addition and subtraction",
-                "Multiplication and division progression",
-                "Decimals and extended operations when appropriate",
-                "Advanced visualisation and mental arithmetic",
-                "Accuracy, independence and controlled speed",
-              ]}
-              meta={["55–60 minute classes", "Up to 8 learners"]}
-            />
+          <SectionCta text={SKILLS_SECTION.cta} />
+        </section>
+
+        {/* 11 — Programmes */}
+        <section className="section dark" id="programmes">
+          <SectionHead
+            eyebrow={PROGRAMMES_SECTION.eyebrow}
+            title={PROGRAMMES_SECTION.title}
+          />
+
+          <div className="path-grid">
+            {PROGRAMMES.map((p) => (
+              <article key={p.title}>
+                <p className="pill">{p.pill}</p>
+                <h3>{p.title}</h3>
+                <p>{p.lede}</p>
+                <ul>
+                  {p.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <strong>{p.meta.join(" · ")}</strong>
+              </article>
+            ))}
           </div>
-          <div className="mt-[27px] grid grid-cols-3 gap-4 max-sm2:grid-cols-1">
-            {AUDIENCE.map(([age, label, text]) => (
-              <div
-                key={age}
-                className="rounded-[15px] border border-line bg-white p-5"
+
+          <div className="center">
+            <a className="button" href="#assessment">
+              {PROGRAMMES_SECTION.cta}
+              <span>→</span>
+            </a>
+          </div>
+        </section>
+
+        {/* 12 — How it works */}
+        <section className="section" id="how-it-works">
+          <SectionHead eyebrow={HOW_SECTION.eyebrow} title={HOW_SECTION.title} />
+
+          <ol className="steps">
+            {HOW_STEPS.map(([title, text], i) => (
+              <li key={title}>
+                <span>{i + 1}</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <SectionCta text={HOW_SECTION.cta} />
+        </section>
+
+        {/* 13 — Fees and modes */}
+        <section className="section learning-modes" id="fees">
+          <SectionHead eyebrow={FEES_SECTION.eyebrow} title={FEES_SECTION.title}>
+            <p>{FEES_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="mode-card-grid">
+            {FEE_MODES.map((mode) => (
+              <article key={mode.title}>
+                <div className={`mode-icon ${mode.iconTone}`}>{mode.icon}</div>
+                <h3>{mode.title}</h3>
+                <p>{mode.lede}</p>
+                <ul>
+                  {mode.features.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+                <div className="mode-foot">
+                  <div>
+                    <strong>{mode.price}</strong>
+                    <span>{mode.note}</span>
+                  </div>
+                  <small>Course fee</small>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="mode-actions">
+            <a className="button" href="#assessment">
+              Enroll for a demo class
+              <span>→</span>
+            </a>
+            <a
+              className="button whatsapp"
+              href={WA_GENERAL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp us for details
+              <span>↗</span>
+            </a>
+          </div>
+
+          <div className="table-wrap mode-table">
+            <table>
+              <thead>
+                <tr>
+                  {FEE_COMPARE_HEADERS.map((h) => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {FEE_COMPARE_ROWS.map((row) => (
+                  <tr key={row[0]}>
+                    {row.map((cell, i) => (
+                      <td key={i}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 14 — Teaching method */}
+        <section className="section">
+          <SectionHead
+            eyebrow={METHOD_SECTION.eyebrow}
+            title={METHOD_SECTION.title}
+          >
+            <p>{METHOD_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="teaching-flow">
+            {METHOD_STEPS.map(([title, text], i) => (
+              <article key={title}>
+                <span>{i + 1}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+
+          <SectionCta text={METHOD_SECTION.cta} />
+        </section>
+
+        {/* 15 — Centre */}
+        <section className="section location" id="centre">
+          <div>
+            <p className="eyebrow">{CENTRE_SECTION.eyebrow}</p>
+            <h2>{CENTRE_SECTION.title}</h2>
+            <p>
+              {CENTRE_SECTION.ledeStart}
+              <a href={CENTRE_SECTION.ledeLinkHref}>
+                {CENTRE_SECTION.ledeLinkLabel}
+              </a>
+              {CENTRE_SECTION.ledeEnd}
+            </p>
+            <address className="centre-address">
+              <strong>{ADDRESS.name}</strong>
+              <br />
+              {ADDRESS.lines.map((line, i) => (
+                <Fragment key={line}>
+                  {line}
+                  {i < ADDRESS.lines.length - 1 && <br />}
+                </Fragment>
+              ))}
+            </address>
+            <div className="button-row">
+              <a
+                className="button"
+                href={ADDRESS.directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <strong className="block text-[.76rem] uppercase tracking-[.08em] text-teal">
-                  {age}
-                </strong>
-                <h3 className="mb-[5px] mt-1 text-[1.05rem]">{label}</h3>
-                <p className="m-0 text-[.86rem] text-slate">{text}</p>
+                Get directions
+                <span>↗</span>
+              </a>
+              <a
+                className="button secondary"
+                href={BUSINESS.mapsShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View us on Google
+                <span>↗</span>
+              </a>
+              <a className="button secondary" href={TEL}>
+                Call centre
+              </a>
+            </div>
+          </div>
+
+          <figure className="google-map-card">
+            <iframe
+              src={`https://www.google.com/maps?q=${encodeURIComponent(
+                `${BUSINESS.name}, ${ADDRESS.streetAddress}, ${ADDRESS.locality}, ${ADDRESS.region} ${ADDRESS.postalCode}`
+              )}&output=embed`}
+              title={`Map showing ${BUSINESS.name} in Hyder Nagar, Hyderabad`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+            <figcaption>
+              <div>
+                <strong>{ADDRESS.name}</strong>
+                <span>{ADDRESS.landmark}</span>
+              </div>
+              <a
+                href={BUSINESS.mapsShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open on Google
+                <span>↗</span>
+              </a>
+            </figcaption>
+          </figure>
+        </section>
+
+        {/* 16 — Home practice */}
+        <section className="section tinted">
+          <SectionHead
+            eyebrow={PRACTICE_SECTION.eyebrow}
+            title={PRACTICE_SECTION.title}
+          >
+            <p>{PRACTICE_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="practice-grid">
+            <div className="practice-number">
+              {PRACTICE.minutes}
+              <span>{PRACTICE.unit}</span>
+            </div>
+            <div>
+              {PRACTICE_BLOCKS.map(([title, text]) => (
+                <Fragment key={title}>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </Fragment>
+              ))}
+            </div>
+          </div>
+
+          <SectionCta text={PRACTICE_SECTION.note} />
+        </section>
+
+        {/* 17 — Benefits and evidence */}
+        <section className="section" id="benefits">
+          <SectionHead
+            eyebrow={BENEFITS_SECTION.eyebrow}
+            title={BENEFITS_SECTION.title}
+          >
+            <p>{BENEFITS_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="benefit-grid">
+            {BENEFIT_PILLS.map((pill) => (
+              <div key={pill}>
+                <span>+</span>
+                {pill}
               </div>
             ))}
           </div>
-        </Section>
 
-        {/* How it works */}
-        <Section id="how" tone="navy" aria-labelledby="how-title">
-          <Eyebrow>From enquiry to first level</Eyebrow>
-          <h2 id="how-title">How it works</h2>
-          <p className="mb-[38px] max-w-[760px] text-[1.06rem] text-white/66">
-            Five steps, in order. Nothing is skipped to fill a batch, and no
-            child is promoted on attendance alone.
-          </p>
-          <div className="steps grid grid-cols-5 gap-3.5 max-lg2:grid-cols-2 max-sm2:grid-cols-1">
-            {STEPS.map(([title, text], i) => (
-              <article
-                key={title}
-                className={`step min-h-[225px] rounded-[17px] border border-white/11 bg-white/8 px-[18px] py-[23px] max-sm2:min-h-0 ${
-                  i === STEPS.length - 1
-                    ? "max-lg2:col-span-2 max-lg2:min-h-0 max-sm2:col-auto"
-                    : ""
-                }`}
-              >
-                <h3 className="text-[1.2rem]">{title}</h3>
-                <p className="m-0 text-[.84rem] text-white/68">{text}</p>
+          <div className="research-links">
+            <div>
+              <p className="eyebrow">{EVIDENCE.eyebrow}</p>
+              <h3>{EVIDENCE.title}</h3>
+              <p>{EVIDENCE.lede}</p>
+            </div>
+            <ul>
+              {EVIDENCE_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                  >
+                    {link.label}
+                    <span>↗</span>
+                  </a>
+                  <small>{link.source}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="honesty">
+            <h3>{NO_PROMISE.title}</h3>
+            <p>{NO_PROMISE.text}</p>
+          </div>
+
+          <SectionCta text={BENEFITS_SECTION.cta} />
+        </section>
+
+        {/* 18 — Is abacus right for your child */}
+        <section className="section tinted">
+          <SectionHead eyebrow={FIT_SECTION.eyebrow} title={FIT_SECTION.title}>
+            <p>{FIT_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="fit-grid">
+            <article className="fit yes">
+              <h3>{READY_SIGNS.title}</h3>
+              <ul>
+                {READY_SIGNS.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article className="fit wait">
+              <h3>{WAIT_SIGNS.title}</h3>
+              <ul>
+                {WAIT_SIGNS.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          </div>
+
+          <p className="table-note">{FIT_SECTION.note}</p>
+
+          <SectionCta text={FIT_SECTION.cta} />
+        </section>
+
+        {/* 19 — Progress assessment */}
+        <section className="section">
+          <SectionHead
+            eyebrow={PROGRESS_SECTION.eyebrow}
+            title={PROGRESS_SECTION.title}
+          >
+            <p>{PROGRESS_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="progress-table">
+            <div className="progress-row heading">
+              {PROGRESS_HEADERS.map((h) => (
+                <span key={h}>{h}</span>
+              ))}
+            </div>
+            {PROGRESS_ROWS.map((row) => (
+              <div className="progress-row" key={row[0]}>
+                {row.map((cell, i) => (
+                  <span key={i}>{cell}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="sample-report">
+            <div>
+              <p className="eyebrow">{EXAMPLE_UPDATE.eyebrow}</p>
+              <h3>{EXAMPLE_UPDATE.title}</h3>
+            </div>
+            {EXAMPLE_UPDATE.lines.map(([term, detail]) => (
+              <p key={term}>
+                <strong>{term}</strong> {detail}
+              </p>
+            ))}
+          </div>
+
+          <SectionCta text={PROGRESS_SECTION.cta} />
+        </section>
+
+        {/* 20 — Trainer */}
+        <section className="section dark" id="trainer">
+          <SectionHead
+            eyebrow={TRAINER_SECTION.eyebrow}
+            title={TRAINER_SECTION.title}
+          >
+            <p>{TRAINER_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="trainer-grid single">
+            <article>
+              <div className="avatar-placeholder">Photo</div>
+              <h3>{TRAINER.name}</h3>
+              <p>{TRAINER.bio}</p>
+              <span className="verify">{TRAINER.experienceBadge}</span>
+            </article>
+          </div>
+
+          <div className="center">
+            <a
+              className="button whatsapp"
+              href={WA_GENERAL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {TRAINER_SECTION.cta}
+              <span>↗</span>
+            </a>
+          </div>
+        </section>
+
+        {/* 21 — Parent feedback */}
+        <section className="section">
+          <SectionHead
+            eyebrow={TESTIMONIALS_SECTION.eyebrow}
+            title={TESTIMONIALS_SECTION.title}
+          >
+            <p>{TESTIMONIALS_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="review-grid">
+            {TESTIMONIALS.map((t, i) => (
+              <article key={i}>
+                <p>“{t.quote}”</p>
+                <div>
+                  <strong>Parent</strong>
+                  <span>{t.meta}</span>
+                </div>
               </article>
             ))}
           </div>
-        </Section>
 
-        {/* Teaching principles */}
-        <Section tone="mist" aria-labelledby="principles-title">
-          <div className="grid grid-cols-[.7fr_1.3fr] items-start gap-9 max-lg2:grid-cols-1">
-            <div>
-              <Eyebrow>How we teach</Eyebrow>
-              <h2 id="principles-title">Our teaching principles</h2>
-              <p className="text-slate">
-                These are the rules we hold ourselves to, and the same ones we
-                suggest you use when comparing any abacus provider.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-[15px] max-sm2:grid-cols-1">
-              {PRINCIPLES.map(([title, text], i) => (
-                <article
-                  key={title}
-                  className="rounded-[15px] border border-line bg-white p-5"
-                >
-                  <span className="mb-3 grid h-[34px] w-[34px] place-items-center rounded-full bg-amber text-[.76rem] font-black text-deep">
-                    {i + 1}
-                  </span>
-                  <h3 className="mb-[5px] text-[1.05rem]">{title}</h3>
-                  <p className="m-0 text-[.86rem] text-slate">{text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-          <div className="mt-6 rounded-[12px] border border-[#f0d58b] border-l-[5px] border-l-amber bg-[#fffaf0] px-[23px] py-[21px] text-[.91rem] text-[#514526]">
-            <strong className="text-navy">What we don’t claim:</strong> abacus
-            training does not raise IQ, create photographic memory, activate a
-            “whole brain” or guarantee school marks. Controlled studies have
-            found arithmetic benefits for some learners, with ease of
-            acquisition and broader transfer varying by child. Read the{" "}
-            <a
-              className="font-extrabold text-[#075f72]"
-              href="https://jnc.psychopen.eu/index.php/jnc/article/view/5761/5761.html"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              classroom study
-            </a>{" "}
-            and{" "}
-            <a
-              className="font-extrabold text-[#075f72]"
-              href="https://langcog.stanford.edu/papers_new/barner-2015-childdev.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              randomised controlled trial
-            </a>
-            .
-          </div>
-        </Section>
-
-        {/* Fees */}
-        <Section id="fees" aria-labelledby="fees-title">
-          <div className="grid grid-cols-[.85fr_1.15fr] items-center gap-[30px] rounded-xl2 border border-line bg-white p-[35px] max-lg2:grid-cols-1 max-sm2:p-[25px_21px]">
-            <div>
-              <Eyebrow>Transparent from the start</Eyebrow>
-              <h2 id="fees-title">Fees, in writing, before you pay</h2>
-              <p className="text-slate">
-                Fees depend on format, class frequency, level length, materials
-                and assessments. Whatever you are quoted — by us or anyone else
-                — ask for the whole list below on paper first.
-              </p>
-              <Button href="#assessment">Request current fees and batches</Button>
-            </div>
-            <div className="grid gap-[9px]">
-              {FEE_ITEMS.map((t) => (
-                <div
-                  key={t}
-                  className="flex gap-2.5 rounded-[11px] bg-mist px-3.5 py-3 text-[.87rem] text-slate"
-                >
-                  <b className="text-teal">✓</b>
-                  <span>{t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        {/* Lead form */}
-        <Section
-          tone="mist"
-          aria-labelledby="assessment-title"
-          containerClassName="max-w-[820px]"
-        >
-          <div
-            id="assessment"
-            className="rounded-xl2 border border-line bg-white p-[29px] shadow-card max-sm2:p-[25px_21px]"
-          >
-            <Eyebrow>Free readiness assessment</Eyebrow>
-            <h2 id="assessment-title" className="mb-2 text-[1.55rem]">
-              Find the right starting level for your child
-            </h2>
-            <p className="text-[.9rem] text-slate">
-              Tell us your child’s age and experience. We’ll help you evaluate
-              readiness, pathway, class length, batch and current fee options.
+          <div className="honesty">
+            <h3>{TESTIMONIALS_NOTE.title}</h3>
+            <p>
+              {TESTIMONIALS_NOTE.text}{" "}
+              <a
+                href={BUSINESS.mapsShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {TESTIMONIALS_NOTE.linkLabel}
+                <span>↗</span>
+              </a>
+              .
             </p>
-            <LeadForm variant="online" />
           </div>
-        </Section>
 
-        {/* FAQ */}
-        <Section id="faq" aria-labelledby="faq-title">
-          <Eyebrow>Parent questions answered</Eyebrow>
-          <h2 id="faq-title">Frequently asked questions</h2>
-          <p className="mb-[38px] max-w-[760px] text-[1.06rem] text-slate">
-            The essentials about age, format, practice and outcomes. Each class
-            page carries a longer, more specific list.
-          </p>
-          <Faq items={FAQS} />
-          <p className="mt-7 text-center text-[.9rem] text-slate">
-            More questions about a specific format?{" "}
-            <Link
-              href={ROUTES.online}
-              className="font-extrabold text-teal no-underline hover:underline"
-            >
-              Online class FAQs
-            </Link>{" "}
-            ·{" "}
-            <Link
-              href={ROUTES.hyderabad}
-              className="font-extrabold text-teal no-underline hover:underline"
-            >
-              Hyderabad class FAQs
-            </Link>
-          </p>
-        </Section>
+          <SectionCta text={TESTIMONIALS_SECTION.cta} />
+        </section>
 
-        {/* Final CTA */}
-        <Section tone="mist">
-          <div className="grid grid-cols-[1fr_.75fr] items-center gap-[42px] rounded-xl2 bg-navy p-[42px] text-white/82 max-lg2:grid-cols-1 max-sm2:p-[25px_21px]">
+        {/* 22 — Selection checklist */}
+        <section className="section dark">
+          <SectionHead
+            eyebrow={CHOOSE_SECTION.eyebrow}
+            title={CHOOSE_SECTION.title}
+          />
+
+          <div className="check-grid">
+            {CHOOSE_CHECKLIST.map((item, i) => (
+              <div key={item}>
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                <p>{item}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="center">
+            <a className="button" href="#assessment">
+              {CHOOSE_SECTION.cta}
+              <span>→</span>
+            </a>
+          </div>
+        </section>
+
+        {/* 23 — Abacus vs Vedic maths */}
+        <section className="section">
+          <SectionHead
+            eyebrow={VEDIC_SECTION.eyebrow}
+            title={VEDIC_SECTION.title}
+          />
+
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  {VEDIC_HEADERS.map((h) => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {VEDIC_ROWS.map((row) => (
+                  <tr key={row[0]}>
+                    {row.map((cell, i) => (
+                      <td key={i}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="table-note">{VEDIC_SECTION.note}</p>
+
+          <SectionCta text={VEDIC_SECTION.cta} />
+        </section>
+
+        {/* 24 — FAQs */}
+        <section className="section faq" id="faq">
+          <SectionHead eyebrow={FAQ_SECTION.eyebrow} title={FAQ_SECTION.title}>
+            <p>{FAQ_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="faq-list open-faq">
+            {FAQS.map(([question, answer], i) => (
+              <article className="faq-item" key={question}>
+                <span className="faq-number">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3>{question}</h3>
+                  <p>{answer}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="related-links">
+            {FAQ_SECTION.links.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+                <span>→</span>
+              </a>
+            ))}
+          </div>
+
+          <SectionCta
+            text={`${FAQ_SECTION.closingTitle} ${FAQ_SECTION.closingText}`}
+          />
+        </section>
+
+        {/* 25 — Enrolment */}
+        <section className="section enrol-section" id="enrol">
+          <SectionHead
+            eyebrow={ENROL_SECTION.eyebrow}
+            title={ENROL_SECTION.title}
+          >
+            <p>{ENROL_SECTION.lede}</p>
+          </SectionHead>
+
+          <div className="enrol-grid">
             <div>
-              <Eyebrow>Start with the right fit</Eyebrow>
-              <h2 className="text-white">
-                See whether abacus learning suits your child
-              </h2>
-              <p>
-                A readiness assessment helps you understand the appropriate
-                pathway, class length, equipment, practice expectation, batch and
-                next step before enrolling.
-              </p>
+              <ol>
+                {ENROL_STEPS.map(([title, text], i) => (
+                  <li key={title}>
+                    <span>{i + 1}</span>
+                    <div>
+                      <h3>{title}</h3>
+                      <p>{text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
-            <div className="grid gap-[11px]">
-              <Button href="#assessment">Book free readiness assessment</Button>
-              <Button variant="secondaryOnDark" href="#assessment">
-                Ask on WhatsApp
-              </Button>
-              <p className="m-0 text-center text-[.74rem] text-white/57">
-                No obligation. Ask for current batches and the written fee sheet.
-              </p>
+
+            <div className="enrol-card">
+              <p className="eyebrow">{ENROL_CTA.eyebrow}</p>
+              <h3>{ENROL_CTA.title}</h3>
+              <p>{ENROL_CTA.lede}</p>
+              <a className="phone-link" href={TEL}>
+                {BUSINESS.phoneDisplay}
+              </a>
+              <a
+                className="button whatsapp"
+                href={WA_DEMO}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {ENROL_CTA.whatsappLabel}
+                <span>↗</span>
+              </a>
             </div>
           </div>
-        </Section>
-      </main>
+        </section>
 
-      <Footer
-        columns={FOOTER_COLUMNS}
-        tagline="Live, level-based abacus and mental arithmetic learning for children, with guided practice and parent-visible progress."
-        whatsappMessage={WHATSAPP_MSG}
-        copyright="Abacus Experts. Educational outcomes vary by learner; no result is guaranteed."
-      />
-      <MobileCta whatsappMessage={WHATSAPP_MSG} />
+        {/* Closing demo form */}
+        <section className="assessment" id="assessment">
+          <div>
+            <p className="eyebrow">{DEMO_SECTION.eyebrow}</p>
+            <h2>{DEMO_SECTION.title}</h2>
+            <p>{DEMO_SECTION.lede}</p>
+            <ul>
+              {DEMO_SECTION.points.map((p) => (
+                <li key={p}>✓ {p}</li>
+              ))}
+            </ul>
+          </div>
+
+          <EnquiryForm {...DEMO_FORM} />
+        </section>
+
+        <SiteFooter />
+        <FloatingActions ctaHref="#enrol" ctaLabel="Enroll now" />
+      </main>
     </>
   );
 }

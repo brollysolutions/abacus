@@ -2,22 +2,24 @@ import { Inter, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { BUSINESS } from "@/lib/business";
 
+/* The reference page loads these two families from Google Fonts.
+   next/font self-hosts them instead — same faces, no third-party
+   request — and exposes them to globals.css as CSS variables. */
 const inter = Inter({
   subsets: ["latin"],
-  display: "swap",
+  weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 const nunito = Nunito_Sans({
   subsets: ["latin"],
   weight: ["400", "600", "700", "800", "900"],
-  display: "swap",
   variable: "--font-nunito",
+  display: "swap",
 });
 
 export const metadata = {
-  // Every relative URL in page metadata (canonical, og:url, og:image …)
-  // is resolved against this. Set once in lib/business.js.
   metadataBase: new URL(BUSINESS.url),
   applicationName: BUSINESS.name,
   authors: [{ name: BUSINESS.name }],
@@ -36,7 +38,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en-IN" className={`${inter.variable} ${nunito.variable}`}>
-      <body>{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

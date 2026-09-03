@@ -1,37 +1,30 @@
+import Image from "next/image";
+import SiteLink from "./SiteLink";
+import { BUSINESS } from "@/lib/business";
+
 /**
- * Brand lockup: the abacus icon + "Abacus Experts" wordmark set in the
- * app's display font (Nunito Sans), matching the headings.
- *
- * tone="dark"  -> navy text, icon as-is (for light backgrounds / header)
- * tone="light" -> white text, icon on a white chip (for the dark footer,
- *                 where the navy icon would otherwise disappear)
+ * Logo + wordmark lockup, used in the header and (with `inverse`) the
+ * footer. Class names match the reference stylesheet.
  */
-export default function Brand({ tone = "dark", iconClassName = "h-10 w-auto" }) {
-  const icon = (
-    <img
-      src="/abacus_icon_transparent.svg"
-      alt=""
-      width={510}
-      height={400}
-      className={iconClassName}
-    />
-  );
+export default function Brand({ inverse = false }) {
   return (
-    <span className="inline-flex items-center gap-2.5">
-      {tone === "light" ? (
-        <span className="inline-flex items-center rounded-[10px] bg-white p-1.5">
-          {icon}
-        </span>
-      ) : (
-        icon
-      )}
-      <span
-        className={`font-display text-[1.25rem] font-extrabold leading-none tracking-[-.02em] ${
-          tone === "light" ? "text-white" : "text-navy"
-        }`}
-      >
-        Abacus Experts
+    <SiteLink
+      href="/#top"
+      className={`brand brand-lockup${inverse ? " inverse" : ""}`}
+      aria-label={`${BUSINESS.name} home`}
+    >
+      <Image
+        src="/abacus-experts-logo.png"
+        alt=""
+        width={128}
+        height={100}
+        priority
+        className="brand-logo"
+      />
+      <span className="brand-name">
+        <strong>{BUSINESS.name}</strong>
+        <small>{BUSINESS.tagline}</small>
       </span>
-    </span>
+    </SiteLink>
   );
 }
