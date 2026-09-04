@@ -45,10 +45,11 @@ Its home page shows **+91 81868 44555**; all thirteen secondary pages show
 **+91 90325 89990**. Both cannot be right.
 
 This build uses a single number — `BUSINESS.phoneDigits` in `lib/business.js`,
-currently set to the home-page one — everywhere: visible text, `tel:` links,
-WhatsApp links and the schema.org `telephone`. **Confirm which number is
-current and change that one constant.** The generated content modules were
-normalised to it, so nothing else needs editing.
+currently set to the secondary-pages one (**+91 90325 89990**) — everywhere:
+visible text, `tel:` links, WhatsApp links and the schema.org `telephone`.
+The generated content modules under `lib/content/` still spell the number out
+in prose and in `wa.me` / `tel:` hrefs, so changing it means updating those
+too — not just the constant.
 
 To re-verify after a change, diff the rendered markup against a fresh copy of
 the reference:
